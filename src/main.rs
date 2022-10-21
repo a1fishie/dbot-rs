@@ -4,22 +4,15 @@ use std::collections::HashSet;
 use std::env;
 use std::sync::Arc;
 
-use serenity::async_trait;
-use serenity::client::bridge::gateway::ShardManager;
-use serenity::framework::standard::macros::group;
-use serenity::framework::StandardFramework;
-use serenity::http::Http;
-use serenity::model::event::ResumedEvent;
-use serenity::model::gateway::Ready;
-use serenity::prelude::*;
+use serenity::{
+    async_trait, client::bridge::gateway::ShardManager, framework::standard::macros::group,
+    framework::StandardFramework, http::Http, model::event::ResumedEvent, model::gateway::Ready,
+    prelude::*,
+};
 use tracing::{error, info};
 
-use crate::cmds::misc::PING_COMMAND;
-use crate::cmds::misc::WHOIS_COMMAND;
-use crate::cmds::misc::TIAS_COMMAND;
-use crate::cmds::misc::AMOGUS_COMMAND;
-use crate::cmds::admin::BAN_COMMAND;
-use crate::cmds::admin::UNBAN_COMMAND;
+use crate::cmds::admin::{BAN_COMMAND, CLEAR_COMMAND, UNBAN_COMMAND};
+use crate::cmds::misc::{PING_COMMAND, ROLL_COMMAND, TIAS_COMMAND, WHOIS_COMMAND};
 
 pub struct ShardManagerContainer;
 
@@ -40,7 +33,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(ping, tias, whois, amogus, unban, ban)]
+#[commands(ping, tias, whois, roll, unban, ban, clear)]
 struct General;
 
 #[tokio::main]
@@ -49,7 +42,7 @@ async fn main() {
     tracing_subscriber::fmt::init();
     let token = env::var("DISCORD_TOKEN").expect("where token man");
     let http = Http::new(&token);
-    let (owners, bot_id) = match http.get_current_application_info().await {
+    let (owners, _bot_id) = match http.get_current_application_info().await {
         Ok(info) => {
             let mut owners = HashSet::new();
             owners.insert(info.owner.id);
